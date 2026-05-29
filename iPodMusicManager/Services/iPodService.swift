@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import Darwin
 
 struct ConnectedIPod: Identifiable, Equatable {
     let id: String          // volume path as stable ID
@@ -67,9 +68,18 @@ final class iPodService: ObservableObject {
 
     func eject(device: ConnectedIPod) async {
         connectedDevices.removeAll { $0.id == device.id }
-        let result = await runShell("/usr/bin/diskutil", ["eject", device.volumeURL.path])
+
+        // Extract BSD device name from volume path via statfs
+        var stat = statfs()
+        guard statfs(device.volumeURL.path, &stat) == 0 else {
+            try? NSWorkspace.shared.unmountAndEjectDevice(at: device.volumeURL)
+            return
+        }
+        let bsdName = String(cString: &stat.f_mntfromname.0)
+        let diskId = bsdName.replacingOccurrences(of: "/dev/", with: "")
+
+        let result = await runShell("/usr/sbin/diskutil", ["eject", diskId])
         if result != 0 {
-            // Fallback: NSWorkspace
             try? NSWorkspace.shared.unmountAndEjectDevice(at: device.volumeURL)
         }
     }
