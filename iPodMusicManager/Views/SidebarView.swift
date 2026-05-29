@@ -4,6 +4,7 @@ struct SidebarView: View {
     @Binding var selection: SidebarItem?
     @EnvironmentObject var navidrome: NavidromeClient
     @EnvironmentObject var queueVM: QueueViewModel
+    @EnvironmentObject var iPodSvc: iPodService
 
     var body: some View {
         List(selection: $selection) {
@@ -22,6 +23,32 @@ struct SidebarView: View {
             Section("Activity") {
                 Label("History", systemImage: "clock.arrow.circlepath")
                     .tag(SidebarItem.history)
+            }
+
+            Section("Devices") {
+                if iPodSvc.connectedDevices.isEmpty {
+                    Label("No iPod Connected", systemImage: "ipodclassic")
+                        .foregroundStyle(.secondary)
+                        .tag(SidebarItem.ipod)
+                } else {
+                    ForEach(iPodSvc.connectedDevices) { device in
+                        HStack(spacing: 6) {
+                            Image(systemName: "ipodclassic")
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(device.name).lineLimit(1)
+                                Text(device.freeSpaceLabel + " free")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            if device.isSyncing {
+                                ProgressView().controlSize(.mini)
+                            } else {
+                                Circle().fill(.green).frame(width: 7, height: 7)
+                            }
+                        }
+                        .tag(SidebarItem.ipod)
+                    }
+                }
             }
         }
         .listStyle(.sidebar)

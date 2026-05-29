@@ -2,7 +2,7 @@ import SwiftUI
 import UserNotifications
 
 enum SidebarItem: String, Hashable {
-    case artists, playlists, local, history
+    case artists, playlists, local, history, ipod
 }
 
 struct ContentView: View {
@@ -10,6 +10,7 @@ struct ContentView: View {
     @EnvironmentObject var libraryVM: LibraryViewModel
     @EnvironmentObject var queueVM: QueueViewModel
     @EnvironmentObject var playlistSync: PlaylistSyncService
+    @EnvironmentObject var iPodSvc: iPodService
 
     @State private var selection: SidebarItem? = .artists
     @State private var showSettings = false
@@ -68,6 +69,7 @@ struct ContentView: View {
                 Task { await libraryVM.loadArtists() }
             }
             UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+            iPodSvc.startPolling()
         }
         .dropDestination(for: URL.self) { urls, _ in
             queueVM.enqueueLocalFiles(urls)
@@ -99,6 +101,13 @@ struct ContentView: View {
         case .history:
             HistoryView()
                 .environmentObject(queueVM)
+        case .ipod:
+            if let device = iPodSvc.connectedDevices.first {
+                iPodView(device: device)
+                    .environmentObject(iPodSvc)
+            } else {
+                iPodEmptyView()
+            }
         }
     }
 

@@ -10,6 +10,7 @@ struct iPodMusicManagerApp: App {
     @StateObject private var queueVM: QueueViewModel
     @StateObject private var libraryVM: LibraryViewModel
     @StateObject private var playlistSync: PlaylistSyncService
+    @StateObject private var iPodSvc = iPodService()
 
     init() {
         let nav = NavidromeClient()
@@ -31,6 +32,7 @@ struct iPodMusicManagerApp: App {
                 .environmentObject(queueVM)
                 .environmentObject(libraryVM)
                 .environmentObject(playlistSync)
+                .environmentObject(iPodSvc)
                 .frame(minWidth: 900, minHeight: 600)
                 .task {
                     // Restore Dock icon preference — deferred until NSApp is ready
