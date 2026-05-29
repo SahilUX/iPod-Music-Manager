@@ -12,12 +12,6 @@ struct iPodMusicManagerApp: App {
     @StateObject private var playlistSync: PlaylistSyncService
 
     init() {
-        // Restore preferred app icon (Dock) from last session
-        let saved = UserDefaults.standard.string(forKey: "preferredAppIcon") ?? AppIconChoice.waveform.rawValue
-        if let choice = AppIconChoice(rawValue: saved), let img = choice.nsImage {
-            NSApp.applicationIconImage = img
-        }
-
         let nav = NavidromeClient()
         let queue = QueueViewModel()
         let pipeline = ConversionPipeline()
@@ -38,6 +32,14 @@ struct iPodMusicManagerApp: App {
                 .environmentObject(libraryVM)
                 .environmentObject(playlistSync)
                 .frame(minWidth: 900, minHeight: 600)
+                .task {
+                    // Restore Dock icon preference — deferred until NSApp is ready
+                    let saved = UserDefaults.standard.string(forKey: "preferredAppIcon")
+                        ?? AppIconChoice.waveform.rawValue
+                    if let choice = AppIconChoice(rawValue: saved), let img = choice.nsImage {
+                        NSApp.applicationIconImage = img
+                    }
+                }
         }
         .windowStyle(.titleBar)
         .commands {
