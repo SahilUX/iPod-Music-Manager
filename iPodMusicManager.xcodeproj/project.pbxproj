@@ -1,0 +1,488 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		07EC3F7C74E3C43EBF54387B /* PlaylistLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C23E35BB34E76B85C0003A3 /* PlaylistLink.swift */; };
+		0E95AD31C06C43422EA5A1F1 /* ConversionPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F535ACCD6400EAAB5A32163 /* ConversionPipeline.swift */; };
+		146D52FD63372ABA565C7B01 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0D311B2E537E8C5209FE9F /* SettingsView.swift */; };
+		1EDA12B6396F33121AE9364F /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB07AE69E5792911DBD254C /* SidebarView.swift */; };
+		3355118FC48D87C92338FECE /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB017A91A2AD38E111264DEE /* LibraryView.swift */; };
+		339D46A4F462E038F2E50AA3 /* ArtistListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D045C93DA8DAA0CE65E4F576 /* ArtistListView.swift */; };
+		3E25B8C9105AFDE04578C014 /* PlaylistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D60EB56E62A76AFFA3B17F10 /* PlaylistDetailView.swift */; };
+		3FD8734FE5A8E9A9671A4A16 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 154FFC565DC4B0877B771C1B /* HistoryView.swift */; };
+		49996A874B0A22821F9FE7C2 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C37D1971D1F72624ADDAD8AB /* PlaylistsView.swift */; };
+		5A6C07DF55B25283AE10DF0B /* LinkPlaylistSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B625199B902F4172DD1435F6 /* LinkPlaylistSheet.swift */; };
+		6478D80A3CC6728ED9BEE3C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5D586BB09B44A6BC9193D38 /* Assets.xcassets */; };
+		668FB345DB8070FAC39BCA8B /* AsyncCoverArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A419956C7DD97162E11B5A14 /* AsyncCoverArt.swift */; };
+		693261502D09B5AE38845A33 /* NavidromeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEEC5178D800971007ABCDC /* NavidromeModels.swift */; };
+		766DDFF5DFCAC042B8028AF4 /* NavidromeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50598B2622FC9AC351C14D7 /* NavidromeClient.swift */; };
+		7BC8680AB3CE8B1D6A6AAF6D /* iPodMusicManagerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF5191109D5B972A3E52365 /* iPodMusicManagerApp.swift */; };
+		80A90BE7F3F7DEDD33DABEFE /* PlaylistSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77E281C61DEF8B6D8F0DC99 /* PlaylistSyncService.swift */; };
+		81C106DE4E7819B7ED18B559 /* LocalDropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69CE52DD842612DADA2BD30E /* LocalDropView.swift */; };
+		87D352F28076626A6FBBA854 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EFD631EC9AF7EA807B8B675 /* LibraryViewModel.swift */; };
+		8C49FE662EA9FDD45FE305E7 /* TrackListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C8E38A6D0758B61326E4EB /* TrackListView.swift */; };
+		8FCDDA840E48A97184A97C59 /* QueueViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC70517D4D5448C1B559873 /* QueueViewModel.swift */; };
+		92F1CDC9FF1170D9BC4CCA4D /* ConversionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3E69ED243029C0C185E44E /* ConversionJob.swift */; };
+		B3F9ECAB8D1B7C449CFB69DE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933677EADB2F28CD7CBC4C02 /* ContentView.swift */; };
+		CD9DABA83D3A06BF89EFB063 /* AlbumGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49406584BF0D749B005E72E7 /* AlbumGridView.swift */; };
+		F72720C6BEC63359CEFBF4DF /* AppleMusicService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A69AEA1D5E7B48296953274 /* AppleMusicService.swift */; };
+		F91B111CC10C5FAB1DC3F05E /* QueuePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C3CEE4414D128C89A1D090 /* QueuePanelView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0FC70517D4D5448C1B559873 /* QueueViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueViewModel.swift; sourceTree = "<group>"; };
+		154FFC565DC4B0877B771C1B /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		1FB07AE69E5792911DBD254C /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		2F535ACCD6400EAAB5A32163 /* ConversionPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversionPipeline.swift; sourceTree = "<group>"; };
+		37CAA8980C3751E044C35AD2 /* iPodMusicManager.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iPodMusicManager.entitlements; sourceTree = "<group>"; };
+		3A3E69ED243029C0C185E44E /* ConversionJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversionJob.swift; sourceTree = "<group>"; };
+		3E0D311B2E537E8C5209FE9F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		3EFD631EC9AF7EA807B8B675 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
+		44F5870313C1F0249441381B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		49406584BF0D749B005E72E7 /* AlbumGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumGridView.swift; sourceTree = "<group>"; };
+		69CE52DD842612DADA2BD30E /* LocalDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDropView.swift; sourceTree = "<group>"; };
+		7C23E35BB34E76B85C0003A3 /* PlaylistLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistLink.swift; sourceTree = "<group>"; };
+		8BEEC5178D800971007ABCDC /* NavidromeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavidromeModels.swift; sourceTree = "<group>"; };
+		933677EADB2F28CD7CBC4C02 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		9A69AEA1D5E7B48296953274 /* AppleMusicService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicService.swift; sourceTree = "<group>"; };
+		9AF5191109D5B972A3E52365 /* iPodMusicManagerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPodMusicManagerApp.swift; sourceTree = "<group>"; };
+		A419956C7DD97162E11B5A14 /* AsyncCoverArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncCoverArt.swift; sourceTree = "<group>"; };
+		B625199B902F4172DD1435F6 /* LinkPlaylistSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPlaylistSheet.swift; sourceTree = "<group>"; };
+		B77E281C61DEF8B6D8F0DC99 /* PlaylistSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSyncService.swift; sourceTree = "<group>"; };
+		C37D1971D1F72624ADDAD8AB /* PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsView.swift; sourceTree = "<group>"; };
+		D045C93DA8DAA0CE65E4F576 /* ArtistListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistListView.swift; sourceTree = "<group>"; };
+		D5D586BB09B44A6BC9193D38 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D60EB56E62A76AFFA3B17F10 /* PlaylistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDetailView.swift; sourceTree = "<group>"; };
+		EB017A91A2AD38E111264DEE /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		F1C8E38A6D0758B61326E4EB /* TrackListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackListView.swift; sourceTree = "<group>"; };
+		F50598B2622FC9AC351C14D7 /* NavidromeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavidromeClient.swift; sourceTree = "<group>"; };
+		F9C3CEE4414D128C89A1D090 /* QueuePanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueuePanelView.swift; sourceTree = "<group>"; };
+		FE12E086596D0B668164F0C8 /* iPod Music Manager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iPod Music Manager.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		078439FC543F4C35730CFAE1 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				49406584BF0D749B005E72E7 /* AlbumGridView.swift */,
+				D045C93DA8DAA0CE65E4F576 /* ArtistListView.swift */,
+				EB017A91A2AD38E111264DEE /* LibraryView.swift */,
+				F1C8E38A6D0758B61326E4EB /* TrackListView.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		1054227C34444FBB1674B01A /* Queue */ = {
+			isa = PBXGroup;
+			children = (
+				F9C3CEE4414D128C89A1D090 /* QueuePanelView.swift */,
+			);
+			path = Queue;
+			sourceTree = "<group>";
+		};
+		186DD33E382059799D4E167D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FE12E086596D0B668164F0C8 /* iPod Music Manager.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2446877C9B02AFA1EE0D4DEE /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3A3E69ED243029C0C185E44E /* ConversionJob.swift */,
+				8BEEC5178D800971007ABCDC /* NavidromeModels.swift */,
+				7C23E35BB34E76B85C0003A3 /* PlaylistLink.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4B5E216C4E09447B61DDF929 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				3E0D311B2E537E8C5209FE9F /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		8D4DA0D87E2C952A88A7895D /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				3EFD631EC9AF7EA807B8B675 /* LibraryViewModel.swift */,
+				0FC70517D4D5448C1B559873 /* QueueViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A0255BEB3B8D0A337DF2CB4C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A419956C7DD97162E11B5A14 /* AsyncCoverArt.swift */,
+				933677EADB2F28CD7CBC4C02 /* ContentView.swift */,
+				154FFC565DC4B0877B771C1B /* HistoryView.swift */,
+				69CE52DD842612DADA2BD30E /* LocalDropView.swift */,
+				1FB07AE69E5792911DBD254C /* SidebarView.swift */,
+				078439FC543F4C35730CFAE1 /* Library */,
+				D95767EF702444E0715786FC /* Playlists */,
+				1054227C34444FBB1674B01A /* Queue */,
+				4B5E216C4E09447B61DDF929 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BE5719D1F7948DF062F5EA22 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9A69AEA1D5E7B48296953274 /* AppleMusicService.swift */,
+				2F535ACCD6400EAAB5A32163 /* ConversionPipeline.swift */,
+				F50598B2622FC9AC351C14D7 /* NavidromeClient.swift */,
+				B77E281C61DEF8B6D8F0DC99 /* PlaylistSyncService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D23AF7D647BEFC0CCDDC5005 = {
+			isa = PBXGroup;
+			children = (
+				EFE0DEAF4E2A2EA09CD4A830 /* iPodMusicManager */,
+				186DD33E382059799D4E167D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D95767EF702444E0715786FC /* Playlists */ = {
+			isa = PBXGroup;
+			children = (
+				B625199B902F4172DD1435F6 /* LinkPlaylistSheet.swift */,
+				D60EB56E62A76AFFA3B17F10 /* PlaylistDetailView.swift */,
+				C37D1971D1F72624ADDAD8AB /* PlaylistsView.swift */,
+			);
+			path = Playlists;
+			sourceTree = "<group>";
+		};
+		EFE0DEAF4E2A2EA09CD4A830 /* iPodMusicManager */ = {
+			isa = PBXGroup;
+			children = (
+				D5D586BB09B44A6BC9193D38 /* Assets.xcassets */,
+				44F5870313C1F0249441381B /* Info.plist */,
+				37CAA8980C3751E044C35AD2 /* iPodMusicManager.entitlements */,
+				FC9FFC12C05A233DF9C4F9ED /* App */,
+				2446877C9B02AFA1EE0D4DEE /* Models */,
+				BE5719D1F7948DF062F5EA22 /* Services */,
+				8D4DA0D87E2C952A88A7895D /* ViewModels */,
+				A0255BEB3B8D0A337DF2CB4C /* Views */,
+			);
+			path = iPodMusicManager;
+			sourceTree = "<group>";
+		};
+		FC9FFC12C05A233DF9C4F9ED /* App */ = {
+			isa = PBXGroup;
+			children = (
+				9AF5191109D5B972A3E52365 /* iPodMusicManagerApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4B8C5005EB90C9869BD76AF5 /* iPodMusicManager */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D57679482049187A03C0F4A /* Build configuration list for PBXNativeTarget "iPodMusicManager" */;
+			buildPhases = (
+				66626927D82B5B9781874EFB /* Sources */,
+				4B06287F68AB17F40E168D24 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iPodMusicManager;
+			packageProductDependencies = (
+			);
+			productName = iPodMusicManager;
+			productReference = FE12E086596D0B668164F0C8 /* iPod Music Manager.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7653B90433B6A565A712C400 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					4B8C5005EB90C9869BD76AF5 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 4DFDEF6C5FB68F6A148128BC /* Build configuration list for PBXProject "iPodMusicManager" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = D23AF7D647BEFC0CCDDC5005;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 186DD33E382059799D4E167D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4B8C5005EB90C9869BD76AF5 /* iPodMusicManager */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4B06287F68AB17F40E168D24 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6478D80A3CC6728ED9BEE3C8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		66626927D82B5B9781874EFB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD9DABA83D3A06BF89EFB063 /* AlbumGridView.swift in Sources */,
+				F72720C6BEC63359CEFBF4DF /* AppleMusicService.swift in Sources */,
+				339D46A4F462E038F2E50AA3 /* ArtistListView.swift in Sources */,
+				668FB345DB8070FAC39BCA8B /* AsyncCoverArt.swift in Sources */,
+				B3F9ECAB8D1B7C449CFB69DE /* ContentView.swift in Sources */,
+				92F1CDC9FF1170D9BC4CCA4D /* ConversionJob.swift in Sources */,
+				0E95AD31C06C43422EA5A1F1 /* ConversionPipeline.swift in Sources */,
+				3FD8734FE5A8E9A9671A4A16 /* HistoryView.swift in Sources */,
+				3355118FC48D87C92338FECE /* LibraryView.swift in Sources */,
+				87D352F28076626A6FBBA854 /* LibraryViewModel.swift in Sources */,
+				5A6C07DF55B25283AE10DF0B /* LinkPlaylistSheet.swift in Sources */,
+				81C106DE4E7819B7ED18B559 /* LocalDropView.swift in Sources */,
+				766DDFF5DFCAC042B8028AF4 /* NavidromeClient.swift in Sources */,
+				693261502D09B5AE38845A33 /* NavidromeModels.swift in Sources */,
+				3E25B8C9105AFDE04578C014 /* PlaylistDetailView.swift in Sources */,
+				07EC3F7C74E3C43EBF54387B /* PlaylistLink.swift in Sources */,
+				80A90BE7F3F7DEDD33DABEFE /* PlaylistSyncService.swift in Sources */,
+				49996A874B0A22821F9FE7C2 /* PlaylistsView.swift in Sources */,
+				F91B111CC10C5FAB1DC3F05E /* QueuePanelView.swift in Sources */,
+				8FCDDA840E48A97184A97C59 /* QueueViewModel.swift in Sources */,
+				146D52FD63372ABA565C7B01 /* SettingsView.swift in Sources */,
+				1EDA12B6396F33121AE9364F /* SidebarView.swift in Sources */,
+				8C49FE662EA9FDD45FE305E7 /* TrackListView.swift in Sources */,
+				7BC8680AB3CE8B1D6A6AAF6D /* iPodMusicManagerApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		41B7BF8D2CCCF2A6B2067635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-ClickWheel";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = YES;
+				CODE_SIGN_ENTITLEMENTS = iPodMusicManager/iPodMusicManager.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 627Y9R25T5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = iPodMusicManager/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sahil.iPodMusicManager;
+				PRODUCT_NAME = "iPod Music Manager";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		8A96F23F6D6240030357ED75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A94DFD9AFAECF26917DC31B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D064E751E91691B45B41C3F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-ClickWheel";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = YES;
+				CODE_SIGN_ENTITLEMENTS = iPodMusicManager/iPodMusicManager.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 627Y9R25T5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = iPodMusicManager/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sahil.iPodMusicManager;
+				PRODUCT_NAME = "iPod Music Manager";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4D57679482049187A03C0F4A /* Build configuration list for PBXNativeTarget "iPodMusicManager" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D064E751E91691B45B41C3F9 /* Debug */,
+				41B7BF8D2CCCF2A6B2067635 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4DFDEF6C5FB68F6A148128BC /* Build configuration list for PBXProject "iPodMusicManager" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A96F23F6D6240030357ED75 /* Debug */,
+				A94DFD9AFAECF26917DC31B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7653B90433B6A565A712C400 /* Project object */;
+}
