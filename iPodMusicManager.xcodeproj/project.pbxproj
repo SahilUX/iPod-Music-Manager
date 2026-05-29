@@ -31,6 +31,7 @@
 		92F1CDC9FF1170D9BC4CCA4D /* ConversionJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A3E69ED243029C0C185E44E /* ConversionJob.swift */; };
 		B3F9ECAB8D1B7C449CFB69DE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933677EADB2F28CD7CBC4C02 /* ContentView.swift */; };
 		CD9DABA83D3A06BF89EFB063 /* AlbumGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49406584BF0D749B005E72E7 /* AlbumGridView.swift */; };
+		E539C2B32F906B93AFE4CA11 /* ServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651A32C92DA45BBF564EFFFC /* ServerView.swift */; };
 		F2DF5CF01F36B33257ED8E03 /* iPodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553F8A6E6B30C0E1CB3C83C8 /* iPodView.swift */; };
 		F72720C6BEC63359CEFBF4DF /* AppleMusicService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A69AEA1D5E7B48296953274 /* AppleMusicService.swift */; };
 		F91B111CC10C5FAB1DC3F05E /* QueuePanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C3CEE4414D128C89A1D090 /* QueuePanelView.swift */; };
@@ -48,6 +49,7 @@
 		44F5870313C1F0249441381B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		49406584BF0D749B005E72E7 /* AlbumGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumGridView.swift; sourceTree = "<group>"; };
 		553F8A6E6B30C0E1CB3C83C8 /* iPodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPodView.swift; sourceTree = "<group>"; };
+		651A32C92DA45BBF564EFFFC /* ServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerView.swift; sourceTree = "<group>"; };
 		6948272B2FE0F207BE4CCC13 /* iPodService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPodService.swift; sourceTree = "<group>"; };
 		69CE52DD842612DADA2BD30E /* LocalDropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDropView.swift; sourceTree = "<group>"; };
 		7C23E35BB34E76B85C0003A3 /* PlaylistLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistLink.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 				49406584BF0D749B005E72E7 /* AlbumGridView.swift */,
 				D045C93DA8DAA0CE65E4F576 /* ArtistListView.swift */,
 				EB017A91A2AD38E111264DEE /* LibraryView.swift */,
+				651A32C92DA45BBF564EFFFC /* ServerView.swift */,
 				F1C8E38A6D0758B61326E4EB /* TrackListView.swift */,
 			);
 			path = Library;
@@ -292,6 +295,7 @@
 				49996A874B0A22821F9FE7C2 /* PlaylistsView.swift in Sources */,
 				F91B111CC10C5FAB1DC3F05E /* QueuePanelView.swift in Sources */,
 				8FCDDA840E48A97184A97C59 /* QueueViewModel.swift in Sources */,
+				E539C2B32F906B93AFE4CA11 /* ServerView.swift in Sources */,
 				146D52FD63372ABA565C7B01 /* SettingsView.swift in Sources */,
 				1EDA12B6396F33121AE9364F /* SidebarView.swift in Sources */,
 				8C49FE662EA9FDD45FE305E7 /* TrackListView.swift in Sources */,

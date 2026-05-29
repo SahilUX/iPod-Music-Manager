@@ -2,7 +2,7 @@ import SwiftUI
 import UserNotifications
 
 enum SidebarItem: String, Hashable {
-    case artists, playlists, local, history, ipod
+    case server, playlists, local, history, ipod
 }
 
 struct ContentView: View {
@@ -12,7 +12,7 @@ struct ContentView: View {
     @EnvironmentObject var playlistSync: PlaylistSyncService
     @EnvironmentObject var iPodSvc: iPodService
 
-    @State private var selection: SidebarItem? = .artists
+    @State private var selection: SidebarItem? = .server
     @State private var showSettings = false
 
     var body: some View {
@@ -29,7 +29,7 @@ struct ContentView: View {
             )
             .onChange(of: selection) { _, newVal in
                 // Clear search when leaving Artists
-                if newVal != .artists { libraryVM.clearSearch() }
+                if newVal != .server { libraryVM.clearSearch() }
             }
 
             if queueVM.showQueue {
@@ -87,10 +87,11 @@ struct ContentView: View {
     @ViewBuilder
     private var detailView: some View {
         switch selection {
-        case .artists, .none:
-            LibraryView()
+        case .server, .none:
+            ServerView()
                 .environmentObject(libraryVM)
                 .environmentObject(queueVM)
+                .environmentObject(navidrome)
         case .playlists:
             PlaylistsView()
                 .environmentObject(playlistSync)

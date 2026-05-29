@@ -65,17 +65,27 @@ struct SubsonicResponse: Codable {
     }
 }
 
+struct NavidromeGenre: Codable, Identifiable, Hashable {
+    var id: String { name }
+    let name: String
+    let songCount: Int?
+    let albumCount: Int?
+}
+
 struct SubsonicBody: Codable {
     let status: String
     let version: String
-    let type: String?           // Navidrome adds "navidrome"
-    let serverVersion: String?  // Navidrome server version string
+    let type: String?
+    let serverVersion: String?
     let artists: ArtistsResponse?
     let artist: ArtistDetailResponse?
     let album: AlbumDetailResponse?
+    let albumList2: AlbumList2Response?
     let playlists: PlaylistsResponse?
     let playlist: PlaylistDetailResponse?
     let searchResult3: SearchResult3Response?
+    let genres: GenresResponse?
+    let songsByGenre: SongsByGenreResponse?
     let error: SubsonicError?
 }
 
@@ -121,5 +131,17 @@ struct PlaylistDetailResponse: Codable {
 struct SearchResult3Response: Codable {
     let artist: [NavidromeArtist]?
     let album: [NavidromeAlbum]?
+    let song: [NavidromeTrack]?
+}
+
+struct AlbumList2Response: Codable {
+    let album: [NavidromeAlbum]?
+}
+
+struct GenresResponse: Codable {
+    let genre: [NavidromeGenre]?
+}
+
+struct SongsByGenreResponse: Codable {
     let song: [NavidromeTrack]?
 }

@@ -3,9 +3,24 @@ import SwiftUI
 
 @MainActor
 final class LibraryViewModel: ObservableObject {
+    // Artists
     @Published var artists: [NavidromeArtist] = []
     @Published var selectedArtistDetail: ArtistDetailResponse?
     @Published var selectedAlbumDetail: AlbumDetailResponse?
+
+    // Albums
+    @Published var allAlbums: [NavidromeAlbum] = []
+
+    // Genres
+    @Published var genres: [NavidromeGenre] = []
+    @Published var selectedGenre: NavidromeGenre?
+    @Published var genreTracks: [NavidromeTrack] = []
+
+    // Server playlists (browse, not linked sync)
+    @Published var serverPlaylists: [NavidromePlaylist] = []
+    @Published var selectedServerPlaylist: NavidromePlaylist?
+    @Published var serverPlaylistTracks: [NavidromeTrack] = []
+
     @Published var searchResults: SearchResult3Response?
     @Published var isLoading = false
     @Published var searchText = ""
@@ -75,6 +90,38 @@ final class LibraryViewModel: ObservableObject {
     func coverArtURL(id: String?, size: Int = 64) -> URL? {
         guard let id else { return nil }
         return client.coverArtURL(id: id, size: size)
+    }
+
+    func loadAllAlbums(type: AlbumListType = .alphabetical) async {
+        isLoading = true; defer { isLoading = false }
+        do { allAlbums = try await client.getAlbumList(type: type) }
+        catch { self.error = error.localizedDescription }
+    }
+
+    func loadGenres() async {
+        isLoading = true; defer { isLoading = false }
+        do { genres = try await client.getGenres() }
+        catch { self.error = error.localizedDescription }
+    }
+
+    func selectGenre(_ genre: NavidromeGenre) async {
+        selectedGenre = genre
+        isLoading = true; defer { isLoading = false }
+        do { genreTracks = try await client.getSongsByGenre(genre: genre.name) }
+        catch { self.error = error.localizedDescription }
+    }
+
+    func loadServerPlaylists() async {
+        isLoading = true; defer { isLoading = false }
+        do { serverPlaylists = try await client.getPlaylists() }
+        catch { self.error = error.localizedDescription }
+    }
+
+    func selectServerPlaylist(_ playlist: NavidromePlaylist) async {
+        selectedServerPlaylist = playlist
+        isLoading = true; defer { isLoading = false }
+        do { serverPlaylistTracks = try await client.getPlaylist(id: playlist.id) }
+        catch { self.error = error.localizedDescription }
     }
 
     func markImported(trackId: String) {

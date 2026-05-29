@@ -9,8 +9,8 @@ struct SidebarView: View {
     var body: some View {
         List(selection: $selection) {
             Section("Library") {
-                Label("Artists", systemImage: "music.mic")
-                    .tag(SidebarItem.artists)
+                Label("Server", systemImage: "server.rack")
+                    .tag(SidebarItem.server)
                 Label("Local Files", systemImage: "folder")
                     .tag(SidebarItem.local)
             }

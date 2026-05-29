@@ -69,6 +69,26 @@ final class NavidromeClient: ObservableObject {
         return body.playlist?.entry ?? []
     }
 
+    func getAlbumList(type: AlbumListType, size: Int = 500, offset: Int = 0) async throws -> [NavidromeAlbum] {
+        var params = ["type": type.rawValue, "size": "\(size)", "offset": "\(offset)"]
+        if case .byGenre(let g) = type { params["genre"] = g }
+        let body = try await fetch(endpoint: "getAlbumList2", params: params)
+        if let err = body.error { throw NavidromeError.apiError(err.message) }
+        return body.albumList2?.album ?? []
+    }
+
+    func getGenres() async throws -> [NavidromeGenre] {
+        let body = try await fetch(endpoint: "getGenres")
+        if let err = body.error { throw NavidromeError.apiError(err.message) }
+        return body.genres?.genre ?? []
+    }
+
+    func getSongsByGenre(genre: String, count: Int = 500) async throws -> [NavidromeTrack] {
+        let body = try await fetch(endpoint: "getSongsByGenre", params: ["genre": genre, "count": "\(count)"])
+        if let err = body.error { throw NavidromeError.apiError(err.message) }
+        return body.songsByGenre?.song ?? []
+    }
+
     func search(query: String) async throws -> SearchResult3Response? {
         let body = try await fetch(endpoint: "search3", params: [
             "query": query, "artistCount": "10", "albumCount": "20", "songCount": "50"
@@ -127,6 +147,20 @@ final class NavidromeClient: ObservableObject {
         params.forEach { items.append(.init(name: $0.key, value: $0.value)) }
         components?.queryItems = items
         return components?.url
+    }
+}
+
+enum AlbumListType {
+    case alphabetical, newest, recent, frequent, starred, byGenre(String)
+    var rawValue: String {
+        switch self {
+        case .alphabetical: return "alphabeticalByName"
+        case .newest:       return "newest"
+        case .recent:       return "recent"
+        case .frequent:     return "frequent"
+        case .starred:      return "starred"
+        case .byGenre:      return "byGenre"
+        }
     }
 }
 
