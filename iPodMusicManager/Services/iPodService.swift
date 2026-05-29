@@ -2,8 +2,9 @@ import Foundation
 import AppKit
 
 struct ConnectedIPod: Identifiable, Equatable {
-    let id: String        // device name as stable ID
+    let id: String          // volume path as stable ID
     let name: String
+    let volumeURL: URL
     let freeSpaceBytes: Int64
     let capacityBytes: Int64
     var isSyncing: Bool = false
@@ -18,8 +19,7 @@ struct ConnectedIPod: Identifiable, Equatable {
     private func formatBytes(_ b: Int64) -> String {
         let gb = Double(b) / 1_073_741_824
         if gb >= 1 { return String(format: "%.1f GB", gb) }
-        let mb = Double(b) / 1_048_576
-        return String(format: "%.0f MB", mb)
+        return String(format: "%.0f MB", Double(b) / 1_048_576)
     }
 }
 
@@ -29,13 +29,29 @@ final class iPodService: ObservableObject {
     @Published var lastSyncedAt: Date?
 
     private var pollTask: Task<Void, Never>?
+    private var observers: [NSObjectProtocol] = []
 
     func startPolling() {
+        // Immediate scan
+        Task { await scan() }
+
+        // Watch for volume mount/unmount events
+        let mount = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: Notification.Name("NSWorkspaceDidMountNotification"), object: nil, queue: .main
+        ) { [weak self] _ in Task { @MainActor in await self?.scan() } }
+
+        let unmount = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: Notification.Name("NSWorkspaceDidUnmountNotification"), object: nil, queue: .main
+        ) { [weak self] _ in Task { @MainActor in await self?.scan() } }
+
+        observers = [mount, unmount]
+
+        // Fallback poll every 10s (catches devices that don't fire notifications)
         pollTask?.cancel()
         pollTask = Task { [weak self] in
             while !Task.isCancelled {
-                await self?.refresh()
-                try? await Task.sleep(for: .seconds(5))
+                try? await Task.sleep(for: .seconds(10))
+                await self?.scan()
             }
         }
     }
@@ -43,34 +59,23 @@ final class iPodService: ObservableObject {
     func stopPolling() {
         pollTask?.cancel()
         pollTask = nil
+        observers.forEach { NSWorkspace.shared.notificationCenter.removeObserver($0) }
+        observers = []
     }
 
-    func refresh() async {
-        let result = try? await runAppleScriptResult("""
-        tell application "Music"
-            set out to ""
-            set ipodSources to every source whose kind is iPod
-            repeat with s in ipodSources
-                set sName to name of s
-                set sFree to free space of s
-                set sCap to capacity of s
-                set out to out & sName & "|" & sFree & "|" & sCap & "\\n"
-            end repeat
-            return out
-        end tell
-        """)
-        let devices = parseDevices(result ?? "")
-        // preserve isSyncing flag for existing devices
-        connectedDevices = devices.map { new in
-            if let existing = connectedDevices.first(where: { $0.id == new.id }) {
-                var updated = new
-                updated.isSyncing = existing.isSyncing
-                return updated
-            }
-            return new
+    func refresh() async { await scan() }
+
+    func eject(device: ConnectedIPod) async {
+        connectedDevices.removeAll { $0.id == device.id }
+        let result = await runShell("/usr/bin/diskutil", ["eject", device.volumeURL.path])
+        if result != 0 {
+            // Fallback: NSWorkspace
+            try? NSWorkspace.shared.unmountAndEjectDevice(at: device.volumeURL)
         }
     }
 
+    // Sync for disk-mode iPods: open Music.app (it may handle sync on launch)
+    // and show the device. Full iTunesDB manipulation is out of scope.
     func sync(device: ConnectedIPod) async {
         guard let idx = connectedDevices.firstIndex(where: { $0.id == device.id }) else { return }
         connectedDevices[idx].isSyncing = true
@@ -80,69 +85,69 @@ final class iPodService: ObservableObject {
             }
             lastSyncedAt = Date()
         }
-        try? await runAppleScript("""
+
+        // Try Music.app AppleScript sync first (works if Music manages this device)
+        let script = """
         tell application "Music"
             activate
-            update (first source whose name is "\(escaped(device.name))" and kind is iPod)
+            set ipodSources to every source whose kind is iPod
+            if (count of ipodSources) > 0 then
+                update (item 1 of ipodSources)
+            end if
         end tell
-        """)
-    }
-
-    func eject(device: ConnectedIPod) async {
-        try? await runAppleScript("""
-        tell application "Music"
-            eject (first source whose name is "\(escaped(device.name))" and kind is iPod)
-        end tell
-        """)
-        connectedDevices.removeAll { $0.id == device.id }
+        """
+        await runAppleScript(script)
     }
 
     // MARK: - Private
 
-    private func parseDevices(_ raw: String) -> [ConnectedIPod] {
-        raw.components(separatedBy: "\n")
-            .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
-            .compactMap { line -> ConnectedIPod? in
-                let parts = line.components(separatedBy: "|")
-                guard parts.count == 3,
-                      let free = Int64(parts[1].trimmingCharacters(in: .whitespaces)),
-                      let cap  = Int64(parts[2].trimmingCharacters(in: .whitespaces))
-                else { return nil }
-                let name = parts[0].trimmingCharacters(in: .whitespaces)
-                return ConnectedIPod(id: name, name: name, freeSpaceBytes: free, capacityBytes: cap)
-            }
+    private func scan() async {
+        let fm = FileManager.default
+        let vols = fm.mountedVolumeURLs(includingResourceValuesForKeys: [
+            .volumeNameKey, .volumeTotalCapacityKey, .volumeAvailableCapacityKey, .volumeIsRemovableKey
+        ], options: []) ?? []
+
+        var found: [ConnectedIPod] = []
+        for url in vols {
+            guard (try? url.resourceValues(forKeys: [.volumeIsRemovableKey]).volumeIsRemovable) == true else { continue }
+            // Classic iPod: has iPod_Control directory
+            let controlDir = url.appendingPathComponent("iPod_Control")
+            // Modern iPod/iPhone: has DCIM or iTunes_Control
+            let itunesControl = url.appendingPathComponent("iTunes_Control")
+            guard fm.fileExists(atPath: controlDir.path) || fm.fileExists(atPath: itunesControl.path) else { continue }
+
+            let res = try? url.resourceValues(forKeys: [.volumeNameKey, .volumeTotalCapacityKey, .volumeAvailableCapacityKey])
+            let name = res?.volumeName ?? url.lastPathComponent
+            let total = Int64(res?.volumeTotalCapacity ?? 0)
+            let free  = Int64(res?.volumeAvailableCapacity ?? 0)
+
+            // Preserve isSyncing state
+            let wasSyncing = connectedDevices.first(where: { $0.id == url.path })?.isSyncing ?? false
+            found.append(ConnectedIPod(
+                id: url.path, name: name, volumeURL: url,
+                freeSpaceBytes: free, capacityBytes: total, isSyncing: wasSyncing
+            ))
+        }
+        connectedDevices = found
     }
 
-    private func escaped(_ s: String) -> String {
-        s.replacingOccurrences(of: "\\", with: "\\\\")
-         .replacingOccurrences(of: "\"", with: "\\\"")
-    }
-
-    private func runAppleScript(_ script: String) async throws {
-        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
+    @discardableResult
+    private func runShell(_ exe: String, _ args: [String]) async -> Int32 {
+        await withCheckedContinuation { cont in
             let p = Process()
-            p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
-            p.arguments = ["-e", script]
-            p.terminationHandler = { proc in
-                proc.terminationStatus == 0
-                    ? cont.resume()
-                    : cont.resume(throwing: NSError(domain: "iPodService", code: Int(proc.terminationStatus)))
-            }
+            p.executableURL = URL(fileURLWithPath: exe)
+            p.arguments = args
+            p.terminationHandler = { cont.resume(returning: $0.terminationStatus) }
             try? p.run()
         }
     }
 
-    private func runAppleScriptResult(_ script: String) async throws -> String {
-        try await withCheckedThrowingContinuation { cont in
+    private func runAppleScript(_ script: String) async {
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
             p.arguments = ["-e", script]
-            let pipe = Pipe()
-            p.standardOutput = pipe
-            p.terminationHandler = { _ in
-                let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                cont.resume(returning: String(data: data, encoding: .utf8) ?? "")
-            }
+            p.terminationHandler = { _ in cont.resume() }
             try? p.run()
         }
     }
