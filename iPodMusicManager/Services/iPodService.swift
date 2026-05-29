@@ -69,18 +69,13 @@ final class iPodService: ObservableObject {
     func eject(device: ConnectedIPod) async {
         connectedDevices.removeAll { $0.id == device.id }
 
-        // Extract BSD device name from volume path via statfs
-        var stat = statfs()
-        guard statfs(device.volumeURL.path, &stat) == 0 else {
-            try? NSWorkspace.shared.unmountAndEjectDevice(at: device.volumeURL)
-            return
-        }
-        let bsdName = String(cString: &stat.f_mntfromname.0)
-        let diskId = bsdName.replacingOccurrences(of: "/dev/", with: "")
-
-        let result = await runShell("/usr/sbin/diskutil", ["eject", diskId])
-        if result != 0 {
-            try? NSWorkspace.shared.unmountAndEjectDevice(at: device.volumeURL)
+        // Disk mode iPods: use NSWorkspace for safe unmount/eject
+        // Avoids unsafe statfs C string handling
+        do {
+            try NSWorkspace.shared.unmountAndEjectDevice(at: device.volumeURL)
+        } catch {
+            // If unmount fails, try diskutil as fallback
+            _ = await runShell("/usr/sbin/diskutil", ["eject", device.volumeURL.path])
         }
     }
 
