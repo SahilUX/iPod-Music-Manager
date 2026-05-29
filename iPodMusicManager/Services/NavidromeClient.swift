@@ -69,6 +69,14 @@ final class NavidromeClient: ObservableObject {
         return body.playlist?.entry ?? []
     }
 
+    func getAllSongs(count: Int = 500) async throws -> [NavidromeTrack] {
+        let body = try await fetch(endpoint: "search3", params: [
+            "query": "", "artistCount": "0", "albumCount": "0", "songCount": "\(count)"
+        ])
+        if let err = body.error { throw NavidromeError.apiError(err.message) }
+        return body.searchResult3?.song ?? []
+    }
+
     func getAlbumList(type: AlbumListType, size: Int = 500, offset: Int = 0) async throws -> [NavidromeAlbum] {
         var params = ["type": type.rawValue, "size": "\(size)", "offset": "\(offset)"]
         if case .byGenre(let g) = type { params["genre"] = g }

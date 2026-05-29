@@ -8,6 +8,9 @@ final class LibraryViewModel: ObservableObject {
     @Published var selectedArtistDetail: ArtistDetailResponse?
     @Published var selectedAlbumDetail: AlbumDetailResponse?
 
+    // Songs
+    @Published var allSongs: [NavidromeTrack] = []
+
     // Albums
     @Published var allAlbums: [NavidromeAlbum] = []
 
@@ -90,6 +93,12 @@ final class LibraryViewModel: ObservableObject {
     func coverArtURL(id: String?, size: Int = 64) -> URL? {
         guard let id else { return nil }
         return client.coverArtURL(id: id, size: size)
+    }
+
+    func loadAllSongs() async {
+        isLoading = true; defer { isLoading = false }
+        do { allSongs = try await client.getAllSongs() }
+        catch { self.error = error.localizedDescription }
     }
 
     func loadAllAlbums(type: AlbumListType = .alphabetical) async {

@@ -1,16 +1,18 @@
 import SwiftUI
 
 enum ServerBrowseMode: String, CaseIterable {
-    case artists  = "Artists"
-    case albums   = "Albums"
+    case artists   = "Artists"
+    case albums    = "Albums"
+    case songs     = "Songs"
     case playlists = "Playlists"
-    case genres   = "Genres"
-    case recent   = "Recent"
+    case genres    = "Genres"
+    case recent    = "Recent"
 
     var icon: String {
         switch self {
         case .artists:   return "music.mic"
         case .albums:    return "square.grid.2x2"
+        case .songs:     return "music.note"
         case .playlists: return "music.note.list"
         case .genres:    return "tag"
         case .recent:    return "clock"
@@ -56,6 +58,7 @@ struct ServerView: View {
                 switch mode {
                 case .artists:   artistsContent
                 case .albums:    albumsContent
+                case .songs:     songsContent
                 case .playlists: playlistsContent
                 case .genres:    genresContent
                 case .recent:    recentContent
@@ -101,6 +104,12 @@ struct ServerView: View {
         ToolbarItem(placement: .navigation) {
             Button("All Artists") { libraryVM.selectedArtistDetail = nil }
         }
+    }
+
+    // MARK: - Songs
+
+    private var songsContent: some View {
+        AllSongsListView(songs: libraryVM.allSongs)
     }
 
     // MARK: - Albums
@@ -158,6 +167,8 @@ struct ServerView: View {
         switch m {
         case .artists:
             if libraryVM.artists.isEmpty { await libraryVM.loadArtists() }
+        case .songs:
+            await libraryVM.loadAllSongs()
         case .albums:
             libraryVM.selectedAlbumDetail = nil
             await libraryVM.loadAllAlbums(type: .alphabetical)
@@ -170,6 +181,73 @@ struct ServerView: View {
         case .recent:
             libraryVM.selectedAlbumDetail = nil
             await libraryVM.loadAllAlbums(type: .newest)
+        }
+    }
+}
+
+// MARK: - All Songs List
+
+struct AllSongsListView: View {
+    let songs: [NavidromeTrack]
+    @EnvironmentObject var queueVM: QueueViewModel
+    @EnvironmentObject var libraryVM: LibraryViewModel
+    @State private var sortOrder = SongSort.title
+
+    enum SongSort: String, CaseIterable {
+        case title = "Title", artist = "Artist", album = "Album", duration = "Duration"
+    }
+
+    private func sortButton(_ s: SongSort) -> some View {
+        let active = sortOrder == s
+        return Button(s.rawValue) { sortOrder = s }
+            .buttonStyle(.borderless)
+            .font(.caption)
+            .foregroundStyle(active ? Color.accentColor : Color.secondary)
+            .fontWeight(active ? .semibold : .regular)
+    }
+
+    private var sorted: [NavidromeTrack] {
+        switch sortOrder {
+        case .title:    return songs.sorted { $0.title.localizedCompare($1.title) == .orderedAscending }
+        case .artist:   return songs.sorted { ($0.artist ?? "").localizedCompare($1.artist ?? "") == .orderedAscending }
+        case .album:    return songs.sorted { ($0.album ?? "").localizedCompare($1.album ?? "") == .orderedAscending }
+        case .duration: return songs.sorted { ($0.duration ?? 0) < ($1.duration ?? 0) }
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Sort bar
+            HStack(spacing: 4) {
+                Text("Sort:")
+                    .font(.caption).foregroundStyle(.secondary)
+                ForEach(SongSort.allCases, id: \.self) { s in
+                    sortButton(s)
+                }
+                Spacer()
+                if !songs.isEmpty {
+                    Text("\(songs.count) tracks")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Button("Add All") { queueVM.enqueue(tracks: songs) }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 6)
+            .background(.bar)
+
+            Divider()
+
+            if songs.isEmpty {
+                ProgressView("Loading songs…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List(sorted) { track in
+                    TrackRow(track: track)
+                }
+                .listStyle(.inset)
+            }
         }
     }
 }
