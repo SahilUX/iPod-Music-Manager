@@ -181,30 +181,19 @@ enum NavidromeError: LocalizedError {
     }
 }
 
-// MARK: - Simple Keychain wrapper
+// MARK: - Credential storage (UserDefaults — no per-build Keychain prompts)
 
-enum KeychainHelper {
+enum CredentialStore {
+    private static let suite = UserDefaults(suiteName: "com.sahil.iPodMusicManager") ?? .standard
+
     static func save(key: String, value: String) {
-        let data = Data(value.utf8)
-        let query: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: key,
-            kSecValueData: data
-        ]
-        SecItemDelete(query as CFDictionary)
-        SecItemAdd(query as CFDictionary, nil)
+        suite.set(value, forKey: key)
     }
 
     static func load(key: String) -> String? {
-        let query: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrAccount: key,
-            kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne
-        ]
-        var result: AnyObject?
-        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
-              let data = result as? Data else { return nil }
-        return String(data: data, encoding: .utf8)
+        suite.string(forKey: key)
     }
 }
+
+// Alias so existing call sites don't need changing
+typealias KeychainHelper = CredentialStore

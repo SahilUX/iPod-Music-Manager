@@ -38,6 +38,7 @@ targets:
         NSAppleScriptEnabled: true
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
+        LSMultipleInstancesProhibited: true
     entitlements:
       path: iPodMusicManager/iPodMusicManager.entitlements
       properties:
