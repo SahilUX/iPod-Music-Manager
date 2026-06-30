@@ -10,6 +10,7 @@ struct ContentView: View {
     @EnvironmentObject var libraryVM: LibraryViewModel
     @EnvironmentObject var queueVM: QueueViewModel
     @EnvironmentObject var playlistSync: PlaylistSyncService
+    @EnvironmentObject var reprocessor: LibraryReprocessor
     @EnvironmentObject var iPodSvc: iPodService
 
     @State private var selection: SidebarItem? = .server
@@ -78,6 +79,7 @@ struct ContentView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView()
                 .environmentObject(navidrome)
+                .environmentObject(reprocessor)
         }
         .onReceive(NotificationCenter.default.publisher(for: .openSettings)) { _ in
             showSettings = true

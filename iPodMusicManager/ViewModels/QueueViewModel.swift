@@ -10,10 +10,12 @@ final class QueueViewModel: ObservableObject {
     private var pipeline = ConversionPipeline()
     private var appleMusic = AppleMusicService()
     private var navidrome: NavidromeClient?
+    private var recordStore: ImportRecordStore?
     private var runTask: Task<Void, Never>?
 
-    func configure(navidrome: NavidromeClient) {
+    func configure(navidrome: NavidromeClient, recordStore: ImportRecordStore? = nil) {
         self.navidrome = navidrome
+        if let recordStore { self.recordStore = recordStore }
     }
 
     // MARK: - Queue management
@@ -71,7 +73,13 @@ final class QueueViewModel: ObservableObject {
 
     // MARK: - Private pipeline
 
+    /// Tolerant index of the current library: match key → track database ID. Built once
+    /// per run and updated as tracks are imported, so duplicate detection and playlist
+    /// membership don't re-scan the library for every job.
+    private var libraryIndex: [String: Int] = [:]
+
     private func processQueue() async {
+        await buildLibraryIndex()
         for job in jobs where job.status == .queued {
             if Task.isCancelled { break }
             await processJob(job)
@@ -82,6 +90,16 @@ final class QueueViewModel: ObservableObject {
         if done + failed > 0 { await sendNotification(done: done, failed: failed) }
     }
 
+    private func buildLibraryIndex() async {
+        guard let snapshot = await appleMusic.allLibraryTracks() else { return }
+        var idx: [String: Int] = [:]
+        for t in snapshot {
+            let key = TrackMatch.key(title: t.title, artist: t.artist)
+            if idx[key] == nil { idx[key] = t.databaseID }
+        }
+        libraryIndex = idx
+    }
+
     private func processJob(_ job: ConversionJob) async {
         let tmpFlac = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(UUID().uuidString).flac")
@@ -89,11 +107,14 @@ final class QueueViewModel: ObservableObject {
         defer { try? FileManager.default.removeItem(at: tmpFlac) }
 
         do {
-            // Duplicate detection
-            let alreadyIn = await appleMusic.isTrackInLibrary(
-                title: job.track.title, artist: job.track.artist ?? ""
-            )
-            if alreadyIn {
+            let matchKey = TrackMatch.key(title: job.track.title, artist: job.track.artist ?? "")
+
+            // Duplicate detection (tolerant): if the track is already in the library,
+            // don't re-import it — just make sure it's in the target playlist (no dup).
+            if let existingID = libraryIndex[matchKey] {
+                if let playlist = job.targetPlaylistName {
+                    try? await appleMusic.addTrackToPlaylistByID(databaseID: existingID, playlistName: playlist)
+                }
                 job.status = .alreadyInLibrary
                 return
             }
@@ -110,21 +131,43 @@ final class QueueViewModel: ObservableObject {
             }
 
             job.status = .converting
-            let m4aURL = try await pipeline.convert(flacURL: flacURL) { p in
+            let defaults = UserDefaults.standard
+            let embedArt = defaults.object(forKey: "embedAlbumArt") as? Bool ?? true
+            let format = OutputFormat(rawValue: defaults.string(forKey: "outputFormat") ?? "") ?? .aac
+            let quality = QualityTier(rawValue: defaults.string(forKey: "outputQuality") ?? "") ?? .high
+            let m4aURL = try await pipeline.convert(
+                flacURL: flacURL, format: format, quality: quality, embedAlbumArt: embedArt
+            ) { p in
                 Task { @MainActor in job.convertProgress = p }
             }
             defer { try? FileManager.default.removeItem(at: m4aURL) }
 
             job.status = .importing
-            try await appleMusic.importTrack(m4aURL: m4aURL)
+            // Apple Music silently ignores formats it can't import (e.g. FLAC): `add`
+            // succeeds but returns no track. A nil ID means nothing landed.
+            guard let newID = try await appleMusic.importTrack(m4aURL: m4aURL) else {
+                throw QueueError.importRejected(format)
+            }
+            // Remember it so other jobs for the same track (in other playlists) treat it
+            // as a duplicate instead of re-importing.
+            libraryIndex[matchKey] = newID
 
             if let playlist = job.targetPlaylistName {
-                try await appleMusic.addTrackToPlaylist(
-                    title: job.track.title,
-                    artist: job.track.artist ?? "",
-                    playlistName: playlist
-                )
+                try? await appleMusic.addTrackToPlaylistByID(databaseID: newID, playlistName: playlist)
             }
+
+            // Record provenance + the settings used, so the track can be re-processed later.
+            let source: ImportRecord.Source = job.localFlacURL.map { .local(path: $0.path) }
+                ?? .navidrome(id: job.track.id)
+            recordStore?.upsert(ImportRecord(
+                title: job.track.title,
+                artist: job.track.artist ?? "",
+                source: source,
+                format: format.rawValue,
+                quality: quality.rawValue,
+                embedAlbumArt: embedArt,
+                importedAt: Date()
+            ))
 
             job.status = .done
 
@@ -146,5 +189,17 @@ final class QueueViewModel: ObservableObject {
 
 enum QueueError: LocalizedError {
     case notConfigured
-    var errorDescription: String? { "Navidrome client not configured" }
+    case importRejected(OutputFormat)
+
+    var errorDescription: String? {
+        switch self {
+        case .notConfigured:
+            return "Navidrome client not configured"
+        case .importRejected(let format):
+            if format == .flac {
+                return "Apple Music can't import FLAC. Choose Apple Lossless in Settings for lossless playback."
+            }
+            return "Apple Music rejected the \(format.label) file — it didn't appear in the library."
+        }
+    }
 }

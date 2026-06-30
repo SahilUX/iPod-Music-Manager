@@ -25,6 +25,7 @@ enum AppIconChoice: String, CaseIterable {
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var navidrome: NavidromeClient
+    @EnvironmentObject var reprocessor: LibraryReprocessor
 
     @State private var serverURL = ""
     @State private var username = ""
@@ -34,6 +35,12 @@ struct SettingsView: View {
     @State private var ffmpegStatus = ""
     @State private var activeTab: SettingsTab = .navidrome
     @AppStorage("preferredAppIcon") private var preferredIconRaw: String = AppIconChoice.waveform.rawValue
+    @AppStorage("embedAlbumArt") private var embedAlbumArt: Bool = true
+    @AppStorage("outputFormat") private var outputFormatRaw: String = OutputFormat.aac.rawValue
+    @AppStorage("outputQuality") private var outputQualityRaw: String = QualityTier.high.rawValue
+
+    private var outputFormat: OutputFormat { OutputFormat(rawValue: outputFormatRaw) ?? .aac }
+    private var outputQuality: QualityTier { QualityTier(rawValue: outputQualityRaw) ?? .high }
 
     enum SettingsTab { case navidrome, general }
 
@@ -176,10 +183,68 @@ struct SettingsView: View {
                         Text("Install via: brew install ffmpeg")
                             .font(.caption).foregroundStyle(.secondary)
                             .padding(12)
+
+                        Divider().padding(.leading, 12)
+                        HStack {
+                            Text("Format")
+                            Spacer()
+                            Picker("", selection: $outputFormatRaw) {
+                                ForEach(OutputFormat.allCases) { fmt in
+                                    Text(fmt.label).tag(fmt.rawValue)
+                                }
+                            }
+                            .labelsHidden()
+                            .fixedSize()
+                        }
+                        .padding(12)
+
+                        if outputFormat == .flac {
+                            HStack(alignment: .top, spacing: 6) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundStyle(.orange)
+                                Text("Apple Music can't import FLAC, so these tracks won't appear in your library or on iPod. For lossless playback on Apple Music and iPod, choose Apple Lossless.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.bottom, 8)
+                        }
+
+                        Divider().padding(.leading, 12)
+                        HStack {
+                            Text("Quality")
+                            Spacer()
+                            if outputFormat.isLossy {
+                                Picker("", selection: $outputQualityRaw) {
+                                    ForEach(QualityTier.allCases) { tier in
+                                        Text("\(tier.label) · \(tier.bitrateLabel)").tag(tier.rawValue)
+                                    }
+                                }
+                                .labelsHidden()
+                                .fixedSize()
+                            } else {
+                                Text("Lossless")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(12)
+
+                        Divider().padding(.leading, 12)
+                        Toggle(isOn: $embedAlbumArt) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Embed album art")
+                                Text("Copy cover art from the source file into converted tracks.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(12)
                     }
                     .background(Color(NSColor.controlBackgroundColor))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
+
+                // Re-process existing library
+                reprocessSection
 
                 // Notifications
                 VStack(alignment: .leading, spacing: 4) {
@@ -200,6 +265,69 @@ struct SettingsView: View {
                 }
             }
             .padding(16)
+        }
+    }
+
+    // MARK: - Re-process library
+
+    private var reprocessSection: some View {
+        let outdated = reprocessor.outdatedCount(
+            format: outputFormat, quality: outputQuality, embedArt: embedAlbumArt
+        )
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("Existing Library")
+                .font(.subheadline).fontWeight(.semibold).foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Scan your Apple Music library to find tracks that can be re-processed, then re-apply the settings above. Format or quality changes re-download and replace from the source; album-art changes update in place. Tracks with no recoverable source are skipped.")
+                    .font(.caption).foregroundStyle(.secondary)
+
+                if reprocessor.isScanning {
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text(reprocessor.statusText.isEmpty ? "Scanning…" : reprocessor.statusText)
+                            .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    }
+                } else if reprocessor.isRunning {
+                    ProgressView(value: reprocessor.progress)
+                    Text(reprocessor.statusText)
+                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                } else {
+                    HStack(spacing: 12) {
+                        Button("Scan Library") {
+                            Task { await reprocessor.scanLibrary() }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+
+                        Button(outdated > 0 ? "Re-process \(outdated) Track\(outdated == 1 ? "" : "s")" : "Re-process Library") {
+                            Task {
+                                await reprocessor.reprocessAll(
+                                    format: outputFormat, quality: outputQuality, embedArt: embedAlbumArt
+                                )
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                        .disabled(outdated == 0)
+                    }
+
+                    if let summary = reprocessor.lastSummary {
+                        Text(summary)
+                            .font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                    } else if let scan = reprocessor.scanSummary {
+                        Text(outdated > 0 ? "\(scan) — \(outdated) differ from current settings."
+                                          : "\(scan) All match the current settings.")
+                            .font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                    } else {
+                        Text("Scan your library to get started.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(NSColor.controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
 

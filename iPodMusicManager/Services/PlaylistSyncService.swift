@@ -71,9 +71,26 @@ final class PlaylistSyncService: ObservableObject {
 
         do {
             let tracks = try await navidrome.getPlaylist(id: id)
+            let playlistName = links[idx].appleMusicPlaylistName
+
+            // Self-heal: forget any previously-synced track that's no longer actually in
+            // Apple Music (e.g. an import silently failed, or the file was deleted) so it
+            // gets re-downloaded. Only prune when the library was read successfully — a
+            // read error returns nil and leaves sync state untouched.
+            if let libTracks = await appleMusic.allLibraryTracks() {
+                let libraryKeys = Set(libTracks.map { ImportRecord.key(title: $0.title, artist: $0.artist) })
+                for tid in Array(links[idx].syncedTrackIds) {
+                    guard let info = links[idx].syncedTrackInfo[tid] else { continue }
+                    let key = ImportRecord.key(title: info.title, artist: info.artist)
+                    if !libraryKeys.contains(key) {
+                        links[idx].syncedTrackIds.remove(tid)
+                        links[idx].syncedTrackInfo.removeValue(forKey: tid)
+                    }
+                }
+            }
+
             let currentIds = Set(tracks.map(\.id))
             let alreadySynced = links[idx].syncedTrackIds
-            let playlistName = links[idx].appleMusicPlaylistName
 
             // Tracks removed from Navidrome playlist since last sync
             let removedIds = alreadySynced.subtracting(currentIds)
@@ -85,7 +102,7 @@ final class PlaylistSyncService: ObservableObject {
             if !removedIds.isEmpty {
                 for removedId in removedIds {
                     if let info = links[idx].syncedTrackInfo[removedId] {
-                        try? await appleMusic.removeTrackFromPlaylist(
+                        await appleMusic.removeTrackFromPlaylist(
                             title: info.title,
                             artist: info.artist,
                             playlistName: playlistName
