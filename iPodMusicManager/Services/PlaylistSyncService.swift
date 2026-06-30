@@ -72,72 +72,69 @@ final class PlaylistSyncService: ObservableObject {
         do {
             let tracks = try await navidrome.getPlaylist(id: id)
             let playlistName = links[idx].appleMusicPlaylistName
-
-            // Self-heal: forget any previously-synced track that's no longer actually in
-            // Apple Music (e.g. an import silently failed, or the file was deleted) so it
-            // gets re-downloaded. Only prune when the library was read successfully — a
-            // read error returns nil and leaves sync state untouched.
-            if let libTracks = await appleMusic.allLibraryTracks() {
-                let libraryKeys = Set(libTracks.map { ImportRecord.key(title: $0.title, artist: $0.artist) })
-                for tid in Array(links[idx].syncedTrackIds) {
-                    guard let info = links[idx].syncedTrackInfo[tid] else { continue }
-                    let key = ImportRecord.key(title: info.title, artist: info.artist)
-                    if !libraryKeys.contains(key) {
-                        links[idx].syncedTrackIds.remove(tid)
-                        links[idx].syncedTrackInfo.removeValue(forKey: tid)
-                    }
-                }
-            }
-
+            let libraryOnly = links[idx].libraryOnly
             let currentIds = Set(tracks.map(\.id))
-            let alreadySynced = links[idx].syncedTrackIds
 
-            // Tracks removed from Navidrome playlist since last sync
-            let removedIds = alreadySynced.subtracting(currentIds)
-
-            // Tracks new to the Navidrome playlist
-            let newTracks = tracks.filter { !alreadySynced.contains($0.id) }
-
-            // --- Handle removals ---
-            if !removedIds.isEmpty {
-                for removedId in removedIds {
-                    if let info = links[idx].syncedTrackInfo[removedId] {
-                        await appleMusic.removeTrackFromPlaylist(
-                            title: info.title,
-                            artist: info.artist,
-                            playlistName: playlistName
-                        )
-                    }
-                    links[idx].syncedTrackIds.remove(removedId)
-                    links[idx].syncedTrackInfo.removeValue(forKey: removedId)
-                }
-            }
-
-            // --- Handle additions ---
-            if !newTracks.isEmpty {
-                try await appleMusic.ensurePlaylistExists(name: playlistName)
-
-                // Mark synced before enqueuing so re-triggers don't double-queue
-                for track in newTracks {
-                    links[idx].syncedTrackIds.insert(track.id)
-                    links[idx].syncedTrackInfo[track.id] = SyncedTrackInfo(
-                        title: track.title,
-                        artist: track.artist ?? ""
+            // --- Removals: tracks that left the Navidrome playlist since last sync ---
+            // For a playlist link, remove them from the Apple Music playlist (library
+            // untouched). For a library-only link there's no playlist, so just forget them.
+            let removedIds = links[idx].syncedTrackIds.subtracting(currentIds)
+            for removedId in removedIds {
+                if !libraryOnly, let info = links[idx].syncedTrackInfo[removedId] {
+                    await appleMusic.removeTrackFromPlaylist(
+                        title: info.title, artist: info.artist, playlistName: playlistName
                     )
                 }
-
-                for track in newTracks {
-                    queueVM.enqueue(ConversionJob(track: track, targetPlaylistName: playlistName))
-                }
-                if !queueVM.isRunning { queueVM.start() }
+                links[idx].syncedTrackIds.remove(removedId)
+                links[idx].syncedTrackInfo.removeValue(forKey: removedId)
             }
+
+            // Build a tolerant index of the current library and (for playlist links) the
+            // playlist's current membership, so we can reconcile exactly what's missing.
+            let libIndex: [String: Int] = (await appleMusic.allLibraryTracks() ?? [])
+                .reduce(into: [:]) { dict, t in
+                    let key = TrackMatch.key(title: t.title, artist: t.artist)
+                    if dict[key] == nil { dict[key] = t.databaseID }
+                }
+            if !libraryOnly { try await appleMusic.ensurePlaylistExists(name: playlistName) }
+            let playlistIDs: Set<Int> = libraryOnly ? [] :
+                Set((await appleMusic.playlistTrackIdentities(playlistName: playlistName) ?? []).map(\.id))
+
+            // --- Reconcile every current track ---
+            // In library  -> ensure it's in the playlist (add by ID if missing; reconciles
+            //                playlists that were left empty by older buggy syncs).
+            // Not in library -> enqueue for download/convert/import.
+            var toEnqueue: [NavidromeTrack] = []
+            var addedToPlaylist = 0
+            for track in tracks {
+                links[idx].syncedTrackIds.insert(track.id)
+                links[idx].syncedTrackInfo[track.id] = SyncedTrackInfo(
+                    title: track.title, artist: track.artist ?? ""
+                )
+                if let dbID = libIndex[TrackMatch.key(title: track.title, artist: track.artist ?? "")] {
+                    if !libraryOnly && !playlistIDs.contains(dbID) {
+                        try? await appleMusic.addTrackToPlaylistByID(databaseID: dbID, playlistName: playlistName)
+                        addedToPlaylist += 1
+                    }
+                } else {
+                    toEnqueue.append(track)
+                }
+            }
+
+            for track in toEnqueue {
+                queueVM.enqueue(ConversionJob(
+                    track: track, targetPlaylistName: libraryOnly ? nil : playlistName
+                ))
+            }
+            if !toEnqueue.isEmpty, !queueVM.isRunning { queueVM.start() }
 
             links[idx].lastSyncedAt = Date()
             save()
 
-            if !newTracks.isEmpty {
+            let changed = toEnqueue.count + addedToPlaylist + removedIds.count
+            if changed > 0 {
                 await notify(playlistName: links[idx].navidromePlaylistName,
-                             added: newTracks.count, removed: removedIds.count)
+                             added: toEnqueue.count + addedToPlaylist, removed: removedIds.count)
             }
         } catch {
             print("PlaylistSync error for \(links[idx].navidromePlaylistName): \(error)")

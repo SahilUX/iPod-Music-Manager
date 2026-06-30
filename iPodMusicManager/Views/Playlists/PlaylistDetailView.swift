@@ -9,6 +9,7 @@ struct PlaylistDetailView: View {
     @State private var autoSync: Bool
     @State private var isEnabled: Bool
     @State private var syncInterval: Int
+    @State private var libraryOnly: Bool
     @State private var isDirty = false
     @State private var showResetConfirm = false
     @State private var showDeleteConfirm = false
@@ -21,6 +22,7 @@ struct PlaylistDetailView: View {
         _autoSync      = State(initialValue: link.autoSync)
         _isEnabled     = State(initialValue: link.isEnabled)
         _syncInterval  = State(initialValue: link.syncIntervalMinutes)
+        _libraryOnly   = State(initialValue: link.libraryOnly)
     }
 
     var body: some View {
@@ -106,13 +108,24 @@ struct PlaylistDetailView: View {
                 }
                 Divider().padding(.leading, 12)
                 settingsRow {
-                    HStack {
-                        Text("Apple Music Playlist")
-                        Spacer()
-                        TextField("Name", text: $appleMusicName)
-                            .multilineTextAlignment(.trailing)
-                            .frame(maxWidth: 200)
-                            .onChange(of: appleMusicName) { _, _ in isDirty = true }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Toggle("Library only (no playlist)", isOn: $libraryOnly)
+                            .onChange(of: libraryOnly) { _, _ in isDirty = true }
+                        Text("Import these songs into your Apple Music library without creating a playlist. They reach the iPod via a whole-library sync.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                if !libraryOnly {
+                    Divider().padding(.leading, 12)
+                    settingsRow {
+                        HStack {
+                            Text("Apple Music Playlist")
+                            Spacer()
+                            TextField("Name", text: $appleMusicName)
+                                .multilineTextAlignment(.trailing)
+                                .frame(maxWidth: 200)
+                                .onChange(of: appleMusicName) { _, _ in isDirty = true }
+                        }
                     }
                 }
                 Divider().padding(.leading, 12)
@@ -230,6 +243,7 @@ struct PlaylistDetailView: View {
         autoSync = link.autoSync
         isEnabled = link.isEnabled
         syncInterval = link.syncIntervalMinutes
+        libraryOnly = link.libraryOnly
         isDirty = false
     }
 
@@ -239,6 +253,7 @@ struct PlaylistDetailView: View {
         updated.autoSync = autoSync
         updated.isEnabled = isEnabled
         updated.syncIntervalMinutes = syncInterval
+        updated.libraryOnly = libraryOnly
         playlistSync.updateLink(updated)
         isDirty = false
     }

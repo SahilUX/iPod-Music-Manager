@@ -16,6 +16,9 @@ struct PlaylistLink: Codable, Identifiable, Hashable {
     var lastSyncedAt: Date?
     var syncedTrackIds: Set<String>
     var syncedTrackInfo: [String: SyncedTrackInfo]  // trackId → title/artist for removal
+    /// When true, tracks are imported into the Apple Music library only — no Apple Music
+    /// playlist is created or maintained for this link.
+    var libraryOnly: Bool
     var isSyncing: Bool = false
 
     init(
@@ -24,7 +27,8 @@ struct PlaylistLink: Codable, Identifiable, Hashable {
         appleMusicPlaylistName: String,
         autoSync: Bool = true,
         isEnabled: Bool = true,
-        syncIntervalMinutes: Int = 60
+        syncIntervalMinutes: Int = 60,
+        libraryOnly: Bool = false
     ) {
         self.navidromePlaylistId = navidromePlaylistId
         self.navidromePlaylistName = navidromePlaylistName
@@ -32,6 +36,7 @@ struct PlaylistLink: Codable, Identifiable, Hashable {
         self.autoSync = autoSync
         self.isEnabled = isEnabled
         self.syncIntervalMinutes = syncIntervalMinutes
+        self.libraryOnly = libraryOnly
         self.syncedTrackIds = []
         self.syncedTrackInfo = [:]
     }
@@ -50,7 +55,7 @@ struct PlaylistLink: Codable, Identifiable, Hashable {
     enum CodingKeys: String, CodingKey {
         case navidromePlaylistId, navidromePlaylistName, appleMusicPlaylistName
         case autoSync, isEnabled, syncIntervalMinutes, lastSyncedAt
-        case syncedTrackIds, syncedTrackInfo
+        case syncedTrackIds, syncedTrackInfo, libraryOnly
     }
 
     init(from decoder: Decoder) throws {
@@ -64,5 +69,6 @@ struct PlaylistLink: Codable, Identifiable, Hashable {
         lastSyncedAt           = try c.decodeIfPresent(Date.self,    forKey: .lastSyncedAt)
         syncedTrackIds         = try c.decode(Set<String>.self,      forKey: .syncedTrackIds)
         syncedTrackInfo        = try c.decodeIfPresent([String: SyncedTrackInfo].self, forKey: .syncedTrackInfo) ?? [:]
+        libraryOnly            = try c.decodeIfPresent(Bool.self,    forKey: .libraryOnly) ?? false
     }
 }
