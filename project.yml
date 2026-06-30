@@ -31,8 +31,8 @@ targets:
       path: iPodMusicManager/Info.plist
       properties:
         CFBundleDisplayName: iPod Music Manager
-        CFBundleShortVersionString: "2.0"
-        CFBundleVersion: "20"
+        CFBundleShortVersionString: "2.1"
+        CFBundleVersion: "21"
         NSPrincipalClass: NSApplication
         NSAppleEventsUsageDescription: "iPod Music Manager controls Apple Music to import and organize tracks."
         NSAppleScriptEnabled: true
