@@ -3,6 +3,9 @@
 **Version:** 1.0  
 **Date:** 2026-05-29
 
+> **Historical v1.0 product/UX spec.** Kept for design intent. For the current
+> architecture, features, and conventions (v2.1+), see **`ARCHITECTURE.md`** and `README.md`.
+
 ---
 
 ## 1. Design Philosophy

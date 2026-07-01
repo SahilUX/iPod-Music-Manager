@@ -4,6 +4,8 @@
 **Date:** 2026-05-29  
 **Status:** Draft
 
+> **Historical v1.0 requirements.** Current architecture/features (v2.1+) live in `ARCHITECTURE.md` and `README.md`.
+
 ---
 
 ## 1. Product Overview
