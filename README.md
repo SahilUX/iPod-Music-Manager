@@ -127,3 +127,7 @@ See **`ARCHITECTURE.md`** for current architecture, conventions, and gotchas (st
 - **osascript** — Apple Music control via AppleScript
 - **Security framework** — Keychain credential storage
 - **UserNotifications** — batch complete + playlist sync notifications
+
+## License
+
+MIT. See [LICENSE](LICENSE).
